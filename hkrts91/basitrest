@@ -1,0 +1,49 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+# Örnek veri deposu
+data = {
+    "message": "Merhaba, dünya!",
+    "status": "success"
+}
+
+# Ana sayfa için GET isteği
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({"message": "Hoşgeldiniz! Bu basit bir REST servisidir."})
+
+# Veriyi almak için GET isteği
+@app.route('/data', methods=['GET'])
+def get_data():
+    return jsonify(data)
+
+# Yeni veri eklemek için POST isteği
+@app.route('/data', methods=['POST'])
+def add_data():
+    if request.is_json:
+        new_data = request.get_json()
+        data.update(new_data)
+        return jsonify({"message": "Veri başarıyla eklendi.", "data": data}), 201
+    else:
+        return jsonify({"message": "Gönderilen veri JSON formatında değil."}), 400
+
+# Veriyi güncellemek için PUT isteği
+@app.route('/data', methods=['PUT'])
+def update_data():
+    if request.is_json:
+        updated_data = request.get_json()
+        data.update(updated_data)
+        return jsonify({"message": "Veri başarıyla güncellendi.", "data": data})
+    else:
+        return jsonify({"message": "Gönderilen veri JSON formatında değil."}), 400
+
+# Veriyi silmek için DELETE isteği
+@app.route('/data', methods=['DELETE'])
+def delete_data():
+    data.clear()
+    return jsonify({"message": "Veri başarıyla silindi."})
+
+# Sunucuyu çalıştırma
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
